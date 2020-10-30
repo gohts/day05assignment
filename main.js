@@ -6,11 +6,10 @@ const withQuery = require('with-query').default;
 
 // configure environment
 const PORT = parseInt(process.argv[2]) || parseInt(process.env.PORT) || 3000;
+const API_KEY = process.env.API_KEY;
 
 // configure News API
 const ENDPOINT = 'https://newsapi.org/v2/top-headlines';
-const API_KEY = 'b93c4d49525446d5b1a9a0e6cd66530e'
-let articles = [];
 
 // create an express instance
 const app = express();

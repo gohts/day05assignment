@@ -1,31 +1,30 @@
 <div class="container-fluid">
     {{#if hasResult}}
-    {{#each articles}}
-        <div class="row mb-5">
-            <div class="col-10">
-                <h4 class="font-weight-bold">{{this.title}}</h4>
-                <img class="my-2" src="{{this.urlToImage}}" alt=""  width="80%">
-                <h5>{{this.description}}</h5>
-                <div class="d-flex justify-content-between">
-                    <div class="float-left">
-                        <h6 class="text-muted">{{this.publishedAt}}</h6>
-                    </div>
-                    <div class="float-right">
-                        <a href="{{this.url}}" target="blank">Read</a>
+        {{#each articles}}
+            <div class="row mb-5">
+                <div class="col-10">
+                    <h4 class="font-weight-bold">{{this.title}}</h4>
+                    <img class="my-2" src="{{this.urlToImage}}" alt=""  width="80%">
+                    <h5>{{this.description}}</h5>
+                    <div class="d-flex justify-content-between">
+                        <div class="float-left">
+                            <h6 class="text-muted">{{this.publishedAt}}</h6>
+                        </div>
+                        <div class="float-right">
+                            <a href="{{this.url}}" target="blank">Read</a>
+                        </div>
                     </div>
                 </div>
+                <div class="col-3"></div>
             </div>
-            <div class="col-3"></div>
-        </div>
-    {{/each}}
+        {{/each}}
     {{else}}
-            <div class="row mb-5">
+        <div class="row mb-5">
             <div class="col-10">
                 <h5>Opps no results returned</h5>
                 <a href="/">Try Again</a>
             </div>
             <div class="col-3"></div>
         </div>
-
     {{/if}}
 </div>

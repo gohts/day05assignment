@@ -10,6 +10,9 @@ const API_KEY = process.env.API_KEY;
 
 // configure News API
 const ENDPOINT = 'https://newsapi.org/v2/top-headlines';
+let articlesRetrieved
+let hasResult
+let retrieveHitory = {}
 
 // create an express instance
 const app = express();
@@ -29,42 +32,59 @@ app.post('/result',
     express.urlencoded({extended: true}),
     express.json(),
     (req,res) => {
+        let queryString = req.body.q.trim().toLowerCase() + '$$' + req.body.country + '$$' + req.body.category;
 
-        console.log(`Request received: ${req.body}`);
-        
-        fetch(withQuery(ENDPOINT, {
-            q: req.body.q,
-            country: req.body.country,
-            category: req.body.category,
-            apiKey: API_KEY
-        }))
-        .then(res => res.json())
-        .then((json) => {
+        if ( (retrieveHitory[queryString]) && (new Date() - new Date(retrieveHitory[queryString].lastRetrieveTS)) < 15*60*1000 ) {
 
-            let hasResult;
-            if (json.totalResults > 0) {
-                hasResult=true
-            } else {
-                hasResult=false
-            }
-            json.articles.forEach(element => {
-                if (element.urlToImage === null) {
-                    element.urlToImage = "/images/headline.png"
-                }
-            });
+            console.log('retrieve from cache')
 
-            console.log(`${hasResult} , articles: ${json.articles}`)
+            articlesRetrieved = retrieveHitory[queryString].articles;
+            hasResult = retrieveHitory[queryString].hasResult;
 
             res.status(200);
             res.type('text/html');
             res.render('result',{
                 hasResult: hasResult,
-                articles: json.articles
+                articles: articlesRetrieved
             });
-        })
-        .catch((err) => {
-            console.error(err);
-        });
+
+        } else {
+
+            console.log('retrieve from API')
+
+            fetch(withQuery(ENDPOINT, {
+                q: req.body.q,
+                country: req.body.country,
+                category: req.body.category,
+                apiKey: API_KEY
+            }))
+            .then(res => res.json())
+            .then((json) => {
+                articlesRetrieved = json.articles;
+                articlesRetrieved.forEach(element => {
+                    if (element.urlToImage === null) {
+                        element.urlToImage = "/images/headline.png"
+                    }
+                });
+
+                hasResult = json.totalResults > 0
+
+                retrieveHitory[queryString] = {
+                            hasResult: hasResult,
+                            articles: articlesRetrieved,
+                            lastRetrieveTS: new Date()
+                }
+                res.status(200);
+                res.type('text/html');
+                res.render('result',{
+                    hasResult: hasResult,
+                    articles: articlesRetrieved
+                });
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+        }
     }
 )
 
@@ -75,5 +95,3 @@ app.use(express.static(__dirname + '/public'));
 app.listen(PORT, () => {
     console.log(`Application started on PORT: ${PORT} at ${new Date()}`);
 })
-
-

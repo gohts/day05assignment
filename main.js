@@ -40,15 +40,25 @@ app.post('/result',
         }))
         .then(res => res.json())
         .then((json) => {
-            console.log(json);
+
+            let hasResult;
+            if (json.totalResults > 0) {
+                hasResult=true
+            } else {
+                hasResult=false
+            }
             json.articles.forEach(element => {
                 if (element.urlToImage === null) {
                     element.urlToImage = "/images/headline.png"
                 }
             });
+
+            console.log(`${hasResult} , articles: ${json.articles}`)
+
             res.status(200);
             res.type('text/html');
             res.render('result',{
+                hasResult: hasResult,
                 articles: json.articles
             });
         })
